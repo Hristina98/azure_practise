@@ -1,0 +1,9 @@
+{
+	"name": "hristina-data-factory-practise",
+	"location": "westeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "a5109df7-41a7-4c5a-9980-2dbeb0029467",
+		"tenantId": "ccce7f5e-a35f-4bc3-8e63-b2215e7d14f9"
+	}
+}
