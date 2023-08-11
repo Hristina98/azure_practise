@@ -5,10 +5,6 @@
 		"typeProperties": {
 			"sources": [
 				{
-					"dataset": {
-						"referenceName": "college_ranks",
-						"type": "DatasetReference"
-					},
 					"name": "CollegeRanks"
 				},
 				{
@@ -21,10 +17,6 @@
 			],
 			"sinks": [
 				{
-					"dataset": {
-						"referenceName": "college_ranks",
-						"type": "DatasetReference"
-					},
 					"name": "sink1"
 				}
 			],
@@ -38,9 +30,7 @@
 			],
 			"scriptLines": [
 				"source(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> CollegeRanks",
+				"     validateSchema: false) ~> CollegeRanks",
 				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> NumOfStud",
@@ -49,13 +39,9 @@
 				"split1@Other filter(\"CollegeName\" == \"Nesto\") ~> filter1",
 				"filter1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     deletable:false,",
-				"     insertable:true,",
-				"     updateable:false,",
-				"     upsertable:false,",
-				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink1"
+				"     skipDuplicateMapOutputs: true,",
+				"     format: 'table') ~> sink1"
 			]
 		}
 	}
