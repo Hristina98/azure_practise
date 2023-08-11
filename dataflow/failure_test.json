@@ -9,35 +9,57 @@
 						"referenceName": "college_ranks",
 						"type": "DatasetReference"
 					},
-					"name": "source1"
+					"name": "CollegeRanks"
 				},
 				{
 					"dataset": {
 						"referenceName": "numOfStud",
 						"type": "DatasetReference"
 					},
-					"name": "source2"
+					"name": "NumOfStud"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "college_ranks",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
-					"name": "join1"
+					"name": "union1"
+				},
+				{
+					"name": "split1"
+				},
+				{
+					"name": "filter1"
 				}
 			],
 			"scriptLines": [
 				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> source1",
+				"     format: 'table') ~> CollegeRanks",
 				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> source2",
-				"source1, source2 join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
-				"     joinType:'outer',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join1"
+				"     ignoreNoFilesFound: false) ~> NumOfStud",
+				"CollegeRanks, NumOfStud union(byName: true)~> union1",
+				"union1 split(equals(\"CollegeName\", \"\"),",
+				"     disjoint: false) ~> split1@(Stream1, Other)",
+				"split1@Stream1 filter(\"CollegeName\" == \"Nesto\") ~> filter1",
+				"filter1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
