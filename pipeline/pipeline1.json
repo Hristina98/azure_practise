@@ -99,8 +99,8 @@
 				]
 			},
 			{
-				"name": "Lookup1",
-				"type": "Lookup",
+				"name": "Data flow1",
+				"type": "ExecuteDataFlow",
 				"dependsOn": [
 					{
 						"activity": "Copy College Rates",
@@ -116,7 +116,18 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "failure_test",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
 			}
 		],
 		"annotations": [],
