@@ -30,9 +30,6 @@
 			],
 			"transformations": [
 				{
-					"name": "union1"
-				},
-				{
 					"name": "split1"
 				},
 				{
@@ -47,10 +44,9 @@
 				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> NumOfStud",
-				"CollegeRanks, NumOfStud union(byName: true)~> union1",
-				"union1 split(equals(\"CollegeName\", \"\"),",
+				"CollegeRanks split(equals(\"CollegeName\", \"\"),",
 				"     disjoint: false) ~> split1@(Stream1, Other)",
-				"split1@Stream1 filter(\"CollegeName\" == \"Nesto\") ~> filter1",
+				"split1@Other filter(\"CollegeName\" == \"Nesto\") ~> filter1",
 				"filter1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
