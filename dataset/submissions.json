@@ -1,0 +1,38 @@
+{
+	"name": "submissions",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorageLink",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Sheet1",
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "submissions.xlsx",
+				"container": "source-container-for-practise"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"name": "isic",
+				"type": "String"
+			},
+			{
+				"name": "broker_domain",
+				"type": "String"
+			},
+			{
+				"name": "turnover",
+				"type": "String"
+			},
+			{
+				"name": "isic_desc",
+				"type": "String"
+			}
+		]
+	}
+}

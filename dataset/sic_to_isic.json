@@ -1,0 +1,30 @@
+{
+	"name": "sic_to_isic",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorageLink",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Sheet1",
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "sic_to_isic_mapping.xlsx",
+				"container": "source-container-for-practise"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"name": "SIC",
+				"type": "String"
+			},
+			{
+				"name": "ISIC",
+				"type": "String"
+			}
+		]
+	}
+}
