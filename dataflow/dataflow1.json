@@ -5,11 +5,26 @@
 		"typeProperties": {
 			"sources": [
 				{
+					"dataset": {
+						"referenceName": "sic_to_isic",
+						"type": "DatasetReference"
+					},
 					"name": "sictoisic"
+				},
+				{
+					"dataset": {
+						"referenceName": "submissions",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
 				}
 			],
 			"sinks": [
 				{
+					"dataset": {
+						"referenceName": "DelimitedText1",
+						"type": "DatasetReference"
+					},
 					"name": "sink1"
 				}
 			],
@@ -19,11 +34,29 @@
 				}
 			],
 			"scriptLines": [
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> sictoisic",
-				"sictoisic alterRow(upsertIf(true())) ~> alterRow1",
+				"source(output(",
+				"          SIC as string,",
+				"          ISIC as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sictoisic",
+				"source(output(",
+				"          isic as string,",
+				"          broker_domain as string,",
+				"          turnover as string,",
+				"          isic_desc as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"sictoisic alterRow(upsertIf(ISIC == '435')) ~> alterRow1",
 				"alterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     input(",
+				"          {College Name} as string,",
+				"          {Num of students} as string",
+				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
