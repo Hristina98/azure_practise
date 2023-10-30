@@ -47,28 +47,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/college_ranks')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzurePostgreSql1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzurePostgreSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "public",
-					"table": "college_rates"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzurePostgreSql1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/numOfStud')]",
+			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -89,14 +68,101 @@
 					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "College Name",
+						"type": "String"
+					},
+					{
+						"name": "Num of students",
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorageLink')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/failure_test')]",
+			"name": "[concat(parameters('factoryName'), '/sic_to_isic')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorageLink",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "Sheet1",
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "sic_to_isic_mapping.xlsx",
+						"container": "source-container-for-practise"
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": [
+					{
+						"name": "SIC",
+						"type": "String"
+					},
+					{
+						"name": "ISIC",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorageLink')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/submissions')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorageLink",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "Sheet1",
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "submissions.xlsx",
+						"container": "source-container-for-practise"
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": [
+					{
+						"name": "isic",
+						"type": "String"
+					},
+					{
+						"name": "broker_domain",
+						"type": "String"
+					},
+					{
+						"name": "turnover",
+						"type": "String"
+					},
+					{
+						"name": "isic_desc",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorageLink')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -105,23 +171,23 @@
 					"sources": [
 						{
 							"dataset": {
-								"referenceName": "college_ranks",
+								"referenceName": "sic_to_isic",
 								"type": "DatasetReference"
 							},
-							"name": "CollegeRanks"
+							"name": "sictoisic"
 						},
 						{
 							"dataset": {
-								"referenceName": "numOfStud",
+								"referenceName": "submissions",
 								"type": "DatasetReference"
 							},
-							"name": "NumOfStud"
+							"name": "source1"
 						}
 					],
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "college_ranks",
+								"referenceName": "DelimitedText1",
 								"type": "DatasetReference"
 							},
 							"name": "sink1"
@@ -129,46 +195,46 @@
 					],
 					"transformations": [
 						{
-							"name": "union1"
-						},
-						{
-							"name": "split1"
-						},
-						{
-							"name": "filter1"
+							"name": "alterRow1"
 						}
 					],
 					"scriptLines": [
-						"source(allowSchemaDrift: true,",
+						"source(output(",
+						"          SIC as string,",
+						"          ISIC as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> CollegeRanks",
-						"source(allowSchemaDrift: true,",
+						"     ignoreNoFilesFound: false) ~> sictoisic",
+						"source(output(",
+						"          isic as string,",
+						"          broker_domain as string,",
+						"          turnover as string,",
+						"          isic_desc as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> NumOfStud",
-						"CollegeRanks, NumOfStud union(byName: true)~> union1",
-						"union1 split(equals(\"CollegeName\", \"\"),",
-						"     disjoint: false) ~> split1@(Stream1, Other)",
-						"split1@Stream1 filter(\"CollegeName\" == \"Nesto\") ~> filter1",
-						"filter1 sink(allowSchemaDrift: true,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"sictoisic alterRow(upsertIf(ISIC=='435')) ~> alterRow1",
+						"alterRow1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
+						"     input(",
+						"          {College Name} as string,",
+						"          {Num of students} as string",
+						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> sink1"
 					]
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/college_ranks')]",
-				"[concat(variables('factoryId'), '/datasets/numOfStud')]"
+				"[concat(variables('factoryId'), '/datasets/sic_to_isic')]",
+				"[concat(variables('factoryId'), '/datasets/submissions')]",
+				"[concat(variables('factoryId'), '/datasets/DelimitedText1')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"name": "[concat(parameters('factoryName'), '/sic_to_isic')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -187,12 +253,12 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataflow": {
-								"referenceName": "failure_test",
+								"referenceName": "dataflow1",
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
-									"CollegeRanks": {},
-									"NumOfStud": {},
+									"sictoisic": {},
+									"source1": {},
 									"sink1": {}
 								}
 							},
@@ -203,17 +269,41 @@
 							},
 							"traceLevel": "Fine"
 						}
+					},
+					{
+						"name": "WebHook1",
+						"type": "WebHook",
+						"dependsOn": [
+							{
+								"activity": "Data flow1",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://zuhlke.webhook.office.com/webhookb2/ae24176e-8d35-4b52-bf89-fbaf738db036@ccce7f5e-a35f-4bc3-8e63-b2215e7d14f9/IncomingWebhook/efa6e2890ad849cdbafce4761b429953/e75998f3-d1d1-4ac0-a7cc-4a979e7f65af",
+							"method": "POST",
+							"headers": {},
+							"body": {
+								"key": "value"
+							},
+							"timeout": "00:10:00"
+						}
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
-				"annotations": [],
-				"lastPublishTime": "2023-08-01T08:56:12Z"
+				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/failure_test')]"
+				"[concat(variables('factoryId'), '/dataflows/dataflow1')]"
 			]
 		}
 	]
