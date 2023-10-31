@@ -25,33 +25,6 @@
 					},
 					"traceLevel": "Fine"
 				}
-			},
-			{
-				"name": "WebHook1",
-				"type": "WebHook",
-				"dependsOn": [
-					{
-						"activity": "Data flow1",
-						"dependencyConditions": [
-							"Failed",
-							"Succeeded",
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"url": "https://zuhlke.webhook.office.com/webhookb2/ae24176e-8d35-4b52-bf89-fbaf738db036@ccce7f5e-a35f-4bc3-8e63-b2215e7d14f9/IncomingWebhook/efa6e2890ad849cdbafce4761b429953/e75998f3-d1d1-4ac0-a7cc-4a979e7f65af",
-					"method": "POST",
-					"body": {
-						"key": "value"
-					},
-					"timeout": "00:10:00"
-				}
 			}
 		],
 		"annotations": []
