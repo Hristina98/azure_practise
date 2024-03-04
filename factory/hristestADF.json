@@ -1,0 +1,9 @@
+{
+	"name": "hristestADF",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "f3a1c5dc-333f-4635-9f0b-ab554336eb43",
+		"tenantId": "ccce7f5e-a35f-4bc3-8e63-b2215e7d14f9"
+	}
+}
