@@ -1,5 +1,5 @@
 {
-	"name": "imdb_data",
+	"name": "imdb_data_my_movies",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "BlobStorage_ls_w3",
